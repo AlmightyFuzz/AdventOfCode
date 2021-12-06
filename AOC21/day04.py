@@ -53,14 +53,19 @@ def mark_card(bingo_card, value):
                 return
 
 
-def check_cards_for_bingo(score_cards):
-    for card_idx, card in enumerate(score_cards):
+def check_cards_for_bingos(bingo_cards):
+    winning_cards = []
+
+    for card_idx, card in enumerate(bingo_cards):
 
         for row in card:
             marks = [space[1] for space in row]
             if sum(marks) == 5:
                 # bingo!
-                return card_idx
+                winning_cards.append(card_idx)
+
+        if card_idx in winning_cards:
+            continue  # and check next card
 
         columns = [[row[i] for row in card] for i in range(5)]
 
@@ -68,30 +73,36 @@ def check_cards_for_bingo(score_cards):
             marks = [space[1] for space in col]
             if sum(marks) == 5:
                 # bingo!
-                return card_idx
+                winning_cards.append(card_idx)
 
-    return None
+    return winning_cards
 
 
-def run_the_numbers(bingo_data):
+def sum_unmarked_numbers(card):
+    sum_unmarked = 0
+
+    for x in range(len(card[0])):
+        for y in range(len(card)):
+            if card[x][y][1] == 0:
+                sum_unmarked += card[x][y][0]
+
+    return sum_unmarked
+
+
+def find_first_winner(bingo_data):
     bingo_numbers, bingo_cards = bingo_data
 
     for num in bingo_numbers:
         for card in bingo_cards:
             mark_card(card, num)
 
-        card_num = check_cards_for_bingo(bingo_cards)
+        card_num = check_cards_for_bingos(bingo_cards)
 
-        if card_num != None:
+        if card_num != []:
             print("Bingo!")
 
-            winning_card = bingo_cards[card_num]
-
-            sum_unmarked = 0
-            for x in range(len(winning_card[0])):
-                for y in range(len(winning_card)):
-                    if winning_card[x][y][1] == 0:
-                        sum_unmarked += winning_card[x][y][0]
+            winning_card = bingo_cards[card_num[0]]
+            sum_unmarked = sum_unmarked_numbers(winning_card)
 
             print(f"Number: {num}")
             print(f"Winning card: {card_num}")
@@ -101,9 +112,39 @@ def run_the_numbers(bingo_data):
             break
 
 
+def find_last_winner(bingo_data):
+    bingo_numbers, bingo_cards = bingo_data
+
+    for num in bingo_numbers:
+        for card in bingo_cards:
+            mark_card(card, num)
+
+        winning_cards = check_cards_for_bingos(bingo_cards)
+        # Sort the indexes so that they are removed back to front.
+        # That way removing an earlier index doesn't alter the the index of a later value
+        winning_cards.sort(reverse=True)
+
+        for card_idx in winning_cards:
+            if len(bingo_cards) > 1:
+                # still searching for final card
+                bingo_cards.pop(card_idx)
+            else:
+                # final card has finally won
+                print("Bango!")
+                sum_unmarked = sum_unmarked_numbers(bingo_cards[0])
+
+                print(f"Number: {num}")
+                print(f"Sum: {sum_unmarked}")
+                print(f"Result: {num * sum_unmarked}")
+
+                return
+
+
 if __name__ == "__main__":
     #data = common.load_test_data(TEST_DATA)
     data = common.load_puzzle_input("data/day04.txt")
 
     bingo_data = process_data(data)
-    run_the_numbers(bingo_data)
+
+    # find_first_winner(bingo_data)
+    find_last_winner(bingo_data)
