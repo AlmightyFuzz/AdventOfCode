@@ -50,6 +50,8 @@ def mark_card(bingo_card, value):
             if bingo_card[x][y][0] == value:
                 bingo_card[x][y][1] = 1
 
+                return
+
 
 def check_cards_for_bingo(score_cards):
     for card_idx, card in enumerate(score_cards):
@@ -83,17 +85,13 @@ def run_the_numbers(bingo_data):
         if card_num != None:
             print("Bingo!")
 
-            file = open("bingooutput.txt", "w")
-            file.write(str(bingo_cards))
-
             winning_card = bingo_cards[card_num]
 
             sum_unmarked = 0
             for x in range(len(winning_card[0])):
                 for y in range(len(winning_card)):
                     if winning_card[x][y][1] == 0:
-                        t = winning_card[x][y][0]
-                        sum_unmarked += t
+                        sum_unmarked += winning_card[x][y][0]
 
             print(f"Number: {num}")
             print(f"Winning card: {card_num}")
