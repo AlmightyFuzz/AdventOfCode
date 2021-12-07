@@ -45,6 +45,18 @@ def initial_vent_map(x, y):
 
     return blank_map
 
+def enumerate_values(a, b):
+    """Returns the values between a and b inclusively, in increasing or decreasing order depending."""
+    values = []
+
+    if a <= b:
+        # increasing
+        values = list(range(a, b+1))
+    elif a > b:
+        # decreasing
+        values = list(range(a, b-1, -1))
+
+    return values
 
 def fill_vent_map(vent_map, lines, straight_lines_only=False):
     for line in lines:
@@ -52,23 +64,16 @@ def fill_vent_map(vent_map, lines, straight_lines_only=False):
         x2, y2 = line[1]
 
         coords = []
-        x_lower = min(x1, x2)
-        x_upper = max(x1, x2)
-        y_lower = min(y1, y2)
-        y_upper = max(y1, y2)
-
-        xs = range(x_lower, x_upper+1)
-        ys = range(y_lower, y_upper+1)
-
+        xs = enumerate_values(x1, x2)
+        ys = enumerate_values(y1, y2)
+        
         if x1 == x2 or y1 == y2:
-            # straight line
+            # extend the short list to same length as longer list
             if len(xs) == 1:
                 xs = [xs[0]] * len(ys)
-
-            if len(ys) == 1:
+            elif len(ys) == 1:
                 ys = [ys[0]] * len(xs)
-        else:
-            # diagonal line
+        else: # diagonal line
             if straight_lines_only:
                 continue
 
@@ -81,17 +86,15 @@ def fill_vent_map(vent_map, lines, straight_lines_only=False):
 
 
 if __name__ == "__main__":
-    data = common.load_test_data(TEST_DATA)
-    #data = common.load_puzzle_input("data/day05.txt")
+    #data = common.load_test_data(TEST_DATA)
+    data = common.load_puzzle_input("data/day05.txt")
     lines = process_data(data)
 
     lx, ly = find_larget_x_and_y(lines)
     vent_map = initial_vent_map(lx, ly)
 
-    #fill_vent_map(vent_map, lines, straight_lines_only=True)
-    fill_vent_map(vent_map, lines)
-
-    ## the diagonal lines aren't being drawn correctly, compare 8,0->0.8 and 0,0->8,8 ##
+    #fill_vent_map(vent_map, lines, straight_lines_only=True) # pt1
+    fill_vent_map(vent_map, lines) # pt2
 
     danger_zones = 0
     for space in vent_map.values():
