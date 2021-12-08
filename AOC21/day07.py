@@ -40,8 +40,11 @@ def calculate_fuel_cost(distance):
         # don't repeat previous calculations
         return CACHED_FUEL_CALCULATION[distance]
     else:
-        fuel = sum([d for d in range(distance+1)])
-        CACHED_FUEL_CALCULATION[distance] = fuel
+        #fuel = sum([d for d in range(distance+1)])
+        # cost of fuel for further distances is just Triangle Numbers,
+        # which can be calculated as t = (n * (n+1)) / 2
+        fuel = (distance * (distance + 1)) / 2
+        CACHED_FUEL_CALCULATION[distance] = int(fuel)
         return fuel
 
 if __name__ == "__main__":
