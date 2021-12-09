@@ -12,13 +12,34 @@ bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbg
 egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
 gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce"""
 
-def parse_input(input):
-    t = []
+
+def parse_input(data):
+    signals = [[output.split(' ') for output in line.split(' | ')]
+               for line in data]
+
+    return signals
+
+
+def count_unique_signals(signals):
+    unique_signals = 0
+    outputs = [signal[1] for signal in signals]
+
+    for output in outputs:
+        if len(output) == 2:  # one
+            unique_signals += 1
+        elif len(output) == 4:  # four
+            unique_signals += 1
+        elif len(output) == 3:  # seven
+            unique_signals += 1
+        elif len(output) == 8:  # eight
+            unique_signals += 1
+
 
 if __name__ == "__main__":
-    input = common.load_test_data(TEST_DATA)
-    #input = common.load_puzzle_input("data/day08.txt")
+    data = common.load_test_data(TEST_DATA)
+    #data = common.load_puzzle_input("data/day08.txt")
 
-    data = parse_input(input)
+    signals = parse_input(data)
+    count_unique_signals(signals)
 
     print(data)
