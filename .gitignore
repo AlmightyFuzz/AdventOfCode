@@ -130,3 +130,7 @@ dmypy.json
 
 .vscode/*
 !.vscode/launch.json
+
+# Don't upload advent of code inputs to repo
+**/data/*
+**/inputdata/*
