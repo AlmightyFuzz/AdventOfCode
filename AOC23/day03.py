@@ -81,9 +81,40 @@ def find_number_with_adjacent_chars(index, diagram):
 
     return adjacent_chars
 
-if __name__ == "__main__":
-    #puz_input = common.load_test_data(TEST_DATA)
-    puz_input = common.load_puzzle_input("data/day03.txt")
+def get_surrouding_indices(index, diagram):
+    '''Returns the indices surrounding the given index'''
+    
+    (ix,iy) = index
+    len_x = len(diagram[0])
+    len_y = len(diagram)
 
-    nums = find_all_numbers(puz_input)
-    check_for_part_numbers(nums, puz_input)
+    start_x = ix - 1
+    end_x = ix + 1
+    start_y = iy - 1
+    end_y = iy + 1
+
+    if ix <= 0:
+        start_x = 0
+
+    if ix >= len_x:
+        end_x = len_x
+
+    if iy <= 0:
+        start_y = 0
+    
+    if iy >= len_y:
+        end_y = len_y
+
+    indices = [(x, y) for x in range(start_x, end_x + 1) for y in range(start_y, end_y + 1)]
+
+    return indices
+
+
+if __name__ == "__main__":
+    puz_input = common.load_test_data(TEST_DATA)
+    #puz_input = common.load_puzzle_input("data/day03.txt")
+
+    #nums = find_all_numbers(puz_input)
+    #check_for_part_numbers(nums, puz_input)
+
+    get_surrouding_indices((1,1), puz_input)
