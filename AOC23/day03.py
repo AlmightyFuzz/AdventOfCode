@@ -81,9 +81,26 @@ def find_number_with_adjacent_chars(index, diagram):
 
     return adjacent_chars
 
+def find_gear_ratio_total(diagram):
+    gear = '*'
+    total_ratio = 0
+
+    for row in range(0, len(diagram)):
+        for column in range(0, len(diagram[0])):
+            char = diagram[row][column]
+
+            if char == gear:
+                indices = get_surrouding_indices((column, row), diagram)
+                numbers = find_numbers(indices, diagram)
+
+                if len(numbers) == 2:
+                    ratio = numbers[0] * numbers[1]
+                    total_ratio += ratio
+
+    print(total_ratio)
+
+
 def get_surrouding_indices(index, diagram):
-    '''Returns the indices surrounding the given index'''
-    
     (ix,iy) = index
     len_x = len(diagram[0])
     len_y = len(diagram)
@@ -109,12 +126,71 @@ def get_surrouding_indices(index, diagram):
 
     return indices
 
+def find_numbers(indices, diagram):
+    is_digit = re.compile(r"\d")
+    numbers = []
+
+    for index in indices:
+        (x, y) = index
+        char = diagram[y][x]
+
+        if is_digit.match(char):
+            num = extract_number(index, diagram)
+
+            if num not in numbers:
+                numbers.append(num)
+
+    return numbers
+
+
+def extract_number(index, diagram):
+    is_digit = re.compile(r"\d")
+    (x, y) = index
+    char = diagram[y][x]
+
+    if not is_digit.match(char):
+        return None
+    
+    start_x = x
+    while(True):
+        c = diagram[y][start_x]
+
+        if not is_digit.match(c):
+            start_x += 1 #we've gone too far so go back one
+            break
+        
+        if start_x == 0:
+            break
+        
+        start_x -= 1
+
+    end_x = x
+    while(True):
+        c = diagram[y][end_x]
+
+        if not is_digit.match(c):
+            end_x -= 1 #we've gone too far so go back one
+            break
+        
+        if end_x == len(diagram[0]) - 1:
+            break
+
+        end_x += 1
+
+    num_str = ""
+    for i in range(start_x, end_x + 1):
+        num_str += diagram[y][i]
+
+    return int(num_str)
+
 
 if __name__ == "__main__":
-    puz_input = common.load_test_data(TEST_DATA)
-    #puz_input = common.load_puzzle_input("data/day03.txt")
+    #puz_input = common.load_test_data(TEST_DATA)
+    puz_input = common.load_puzzle_input("data/day03.txt")
 
+    # part 1
     #nums = find_all_numbers(puz_input)
     #check_for_part_numbers(nums, puz_input)
 
-    get_surrouding_indices((1,1), puz_input)
+    # part 2
+    find_gear_ratio_total(puz_input)
