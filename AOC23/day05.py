@@ -1,6 +1,4 @@
-import re
 import sys
-import common
 
 TEST_DATA = """seeds: 79 14 55 13
 
@@ -89,34 +87,18 @@ def calculate_map_conversions(map):
     return [(range(m[1], m[1] + m[2]), m[0] - m[1]) for m in map]
 
 
-def do_thing(almanac):
+def do_thing(seeds, almanac):
     lowest_location = sys.maxsize
 
-    seeds = almanac[0]
-
     for seed in seeds:
-        print(f"seed: {seed}")
 
         soil = apply_map(seed, almanac[1])
-        print(f"soil: {soil}")
-
         fert = apply_map(soil, almanac[2])
-        print(f"fertilizer: {fert}")
-
         water = apply_map(fert, almanac[3])
-        print(f"water: {water}")
-
         light = apply_map(water, almanac[4])
-        print(f"light: {light}")
-
         temp = apply_map(light, almanac[5])
-        print(f"temperature: {temp}")
-
         humidity = apply_map(temp, almanac[6])
-        print(f"humidity: {humidity}")
-
         location = apply_map(humidity, almanac[7])
-        print(f"location: {location}\n")
 
         if location < lowest_location:
             lowest_location = location
@@ -135,9 +117,79 @@ def apply_map(current_val, mapping):
     return current
 
 
+def do_new_thing(seed_ranges, almanac):
+    transformed_ranges = seed_ranges
+
+    for page in almanac[1:]:
+        changes = []
+
+        for map in page:
+            map_range = map[0]
+            offset = map[1]
+
+            for i, _range in enumerate(transformed_ranges):
+
+                if _range.stop <= map_range.start or _range.start >= map_range.stop:
+                    # fully outside
+                    continue
+
+                if _range.start >= map_range.start and _range.stop <= map_range.stop:
+                    # fully inside
+                    changes.append([i, offset])
+                    continue
+
+                if _range.start >= map_range.start and _range.start < map_range.stop:
+                    # start falls inside map range
+                    changed = range(_range.start, map_range.stop)
+                    transformed_ranges[i] = changed
+                    changes.append([i, offset])
+
+                    new = range(map_range.stop, _range.stop)
+                    transformed_ranges.append(new)
+                    continue
+
+                if _range.stop > map_range.start and _range.stop < map_range.stop:
+                    # end falls inside map range
+                    changed = range(map_range.start, _range.stop)
+                    transformed_ranges[i] = changed
+                    changes.append([i, offset])
+
+                    new = range(_range.start, map_range.start)
+                    transformed_ranges.append(new)
+                    continue
+
+                if _range.start < map_range.start and _range.stop > map_range.stop:
+                    # spans across whole map
+                    changed = range(map_range.start, map_range.stop)
+                    transformed_ranges[i] = changed
+                    changes.append([i, offset])
+
+                    new_before = range(_range.start, map_range.start)
+                    new_after = range(map_range.stop, _range.stop)
+                    transformed_ranges.append(new_before)
+                    transformed_ranges.append(new_after)
+
+        for change in changes:
+            (index, offset) = change
+            r = transformed_ranges[index]
+            transformed_ranges[index] = range(r.start + offset, r.stop + offset)
+
+    lowest_location = min([r.start for r in transformed_ranges])
+    print(f"lowest location: {lowest_location}")
+
+
 if __name__ == "__main__":
     # puz_input = TEST_DATA
     puz_input = open("data/day05.txt").read()
 
     almanac = read_almanac(puz_input)
-    do_thing(almanac)
+    seeds_nums = almanac[0]
+
+    # Pt 1
+    # do_thing(seeds_nums, almanac)
+
+    # Pt 2
+    pairs = [seeds_nums[s : s + 2] for s in range(0, len(seeds_nums), 2)]
+    ranges = [range(p[0], p[0] + p[1]) for p in pairs]
+
+    seeds = do_new_thing(ranges, almanac)
