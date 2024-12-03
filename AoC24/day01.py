@@ -1,5 +1,4 @@
 import common
-import re
 
 TEST_DATA = """3   4
 4   3
