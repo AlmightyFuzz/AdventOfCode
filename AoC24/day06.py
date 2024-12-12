@@ -63,12 +63,10 @@ def plot_walk(grid):
 
     current_point = guard_point[0]
     positions = []
-    # positions.add(current_point)
 
     left_grid = False
 
     while not left_grid:
-        # print(current_point)
         positions.append(current_point)
 
         next_point = next_step(current_point, guard_dir)
@@ -85,8 +83,7 @@ def plot_walk(grid):
 
 
 if __name__ == "__main__":
-    # puz_input = common.load_test_data(TEST_DATA)
-    # answer is one less than correct answer
-    puz_input = common.load_puzzle_input("data/day06.txt")
+    puz_input = common.load_test_data(TEST_DATA)
+    # puz_input = common.load_puzzle_input("data/day06.txt")
 
     plot_walk(puz_input)
